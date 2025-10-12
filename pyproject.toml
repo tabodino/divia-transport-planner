@@ -1,0 +1,18 @@
+[project]
+name = "divia-transport-planner"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "jupyter>=1.1.1",
+    "networkx>=3.5",
+    "pandas>=2.3.3",
+]
+
+[dependency-groups]
+dev = [
+    "pylint>=3.3.9",
+    "pytest>=8.4.2",
+    "ruff>=0.14.0",
+]
