@@ -1,6 +1,6 @@
 # Divia-Transport-Planner
 
-A comprehensive route planning system for the DiviaMobilités public transportation network using GTFS data, NetworkX graph algorithms, and AI-powered assistance.
+A comprehensive route planning system for the "DiviaMobilités" public transportation network using GTFS data, NetworkX graph algorithms, and AI-powered assistance.
 
 ## Setup
 

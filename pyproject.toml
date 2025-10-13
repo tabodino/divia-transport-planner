@@ -1,13 +1,17 @@
 [project]
 name = "divia-transport-planner"
 version = "0.1.0"
-description = "Add your description here"
+description = "A comprehensive route planning system for the DiviaMobilités public transportation network using GTFS data, NetworkX graph algorithms, and AI-powered assistance."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "dotenv>=0.9.9",
     "jupyter>=1.1.1",
+    "loguru>=0.7.3",
     "networkx>=3.5",
     "pandas>=2.3.3",
+    "pydantic>=2.12.0",
+    "pydantic-settings>=2.11.0",
 ]
 
 [dependency-groups]
