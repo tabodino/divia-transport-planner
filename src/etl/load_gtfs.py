@@ -133,6 +133,6 @@ class GTFSLoader:
         return dataframes
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     loader = GTFSLoader()
     loader.run_etl()
