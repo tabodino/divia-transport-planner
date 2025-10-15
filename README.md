@@ -70,9 +70,11 @@ Edit ".env" file if needed
 
 ## Usage
 
-To run the ETL, use the following comand:
+To run the ETL, use the following command:
 
+```bash
 uv run python run_etl.py
+```
 
 
 ## Testing
