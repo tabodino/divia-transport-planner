@@ -76,24 +76,12 @@ class GTFSLoader:
         """
         logger.info("Loading GTFS files into DataFrames")
 
-        gtfs_files = [
-            "agency.txt",
-            "stops.txt",
-            "routes.txt",
-            "trips.txt",
-            "stop_times.txt",
-            "calendar.txt",
-            "shapes.txt",
-        ]
-
         dataframes = {}
-        for filename in gtfs_files:
-            file_path = gtfs_dir / filename
-            if file_path.exists():
-                logger.info(f"Loading {filename}")
-                dataframes[filename.replace(".txt", "")] = pd.read_csv(file_path)
-            else:
-                logger.warning(f"File {filename} not found")
+        for file_path in gtfs_dir.glob("*.txt"):
+            filename = file_path.name
+
+            logger.info(f"Loading {filename}")
+            dataframes[filename.replace(".txt", "")] = pd.read_csv(file_path)
 
         logger.info(f"Loaded {len(dataframes)} GTFS files")
         return dataframes

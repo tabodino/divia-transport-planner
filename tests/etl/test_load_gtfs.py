@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 import pandas as pd
 import pytest
 import requests
+from pathlib import Path
 from src.etl.load_gtfs import GTFSLoader
 
 
@@ -220,9 +221,10 @@ class TestLoadGTFSFiles:
 
         dataframes = gtfs_loader.load_gtfs_files(gtfs_dir)
 
-        assert len(dataframes) == 7
+        assert len(dataframes) == len(sample_gtfs_data)
         assert "stops" in dataframes
         assert "routes" in dataframes
+        assert "shapes" in dataframes
         assert len(dataframes["stops"]) == 2
         assert len(dataframes["routes"]) == 2
 
@@ -235,12 +237,16 @@ class TestLoadGTFSFiles:
         pd.DataFrame({"stop_id": ["1"], "stop_name": ["Test"]}).to_csv(
             gtfs_dir / "stops.txt", index=False
         )
+        (gtfs_dir / "readme.md").write_text("# README")
+        (gtfs_dir / "data.json").write_text('{"key": "value"}')
+        (gtfs_dir / "config.yaml").write_text("key: value")
 
         dataframes = gtfs_loader.load_gtfs_files(gtfs_dir)
 
         assert len(dataframes) == 1
         assert "stops" in dataframes
-        assert "routes" not in dataframes
+        assert "readme" not in dataframes
+        assert "data" not in dataframes
 
     def test_load_empty_directory(self, gtfs_loader, tmp_path):
         """Test loading from an empty directory."""
@@ -251,16 +257,33 @@ class TestLoadGTFSFiles:
 
         assert len(dataframes) == 0
 
+    def test_load_with_extra_gtfs_files(self, gtfs_loader, tmp_path):
+        """Test chargement avec des fichiers GTFS supplémentaires."""
+        gtfs_dir = tmp_path / "gtfs"
+        gtfs_dir.mkdir()
+        
+        pd.DataFrame({"stop_id": ["1"]}).to_csv(gtfs_dir / "stops.txt", index=False)
+        pd.DataFrame({"route_id": ["L1"]}).to_csv(gtfs_dir / "routes.txt", index=False)
+        pd.DataFrame({"fare_id": ["F1"]}).to_csv(gtfs_dir / "fare_attributes.txt", index=False)
+        pd.DataFrame({"transfer_type": [0]}).to_csv(gtfs_dir / "transfers.txt", index=False)
+
+        dataframes = gtfs_loader.load_gtfs_files(gtfs_dir)
+
+        assert len(dataframes) == 4
+        assert "stops" in dataframes
+        assert "routes" in dataframes
+        assert "fare_attributes" in dataframes
+        assert "transfers" in dataframes
+
+
     def test_load_malformed_csv(self, gtfs_loader, tmp_path):
         """Test loading a malformed CSV file."""
         gtfs_dir = tmp_path / "gtfs"
         gtfs_dir.mkdir()
 
-        # Create a truly malformed CSV that will cause an error
         (gtfs_dir / "stops.txt").write_text("stop_id,stop_name\n1,2,3,4,5\n6,7,8")
 
         # Pandas will load this but with warnings, not errors
-        # So we test that it loads without crashing
         dataframes = gtfs_loader.load_gtfs_files(gtfs_dir)
         assert "stops" in dataframes
 
@@ -328,7 +351,7 @@ class TestRunETL:
         with patch.object(gtfs_loader, "download_gtfs", return_value=zip_path):
             result = gtfs_loader.run_etl()
 
-        assert len(result) == 7
+        assert len(result) == len(sample_gtfs_data)
         assert "stops" in result
         assert "routes" in result
 

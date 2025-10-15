@@ -5,3 +5,4 @@
 ### Added
 
 - Add ETL to extract GTFS dataset
+- Add EDA exploration notebook to understand GTFS datasets 
