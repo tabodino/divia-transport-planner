@@ -1,7 +1,8 @@
 """Load and process GTFS data from DiviaMobilités."""
 
 import zipfile
-from pathlib import Path
+
+from pathlib import Path  # noqa: F401
 from typing import Dict
 
 import pandas as pd

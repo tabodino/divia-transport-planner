@@ -97,7 +97,7 @@ uv run pylint src/
 
 ## Ruff
 ```bash
-uv run ruff format src/*
+uv run ruff format src/
 ```
 
 ## Contributing

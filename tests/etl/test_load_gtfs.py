@@ -5,7 +5,6 @@ from unittest.mock import Mock, patch
 import pandas as pd
 import pytest
 import requests
-from pathlib import Path
 from src.etl.load_gtfs import GTFSLoader
 
 
@@ -261,11 +260,15 @@ class TestLoadGTFSFiles:
         """Test chargement avec des fichiers GTFS supplémentaires."""
         gtfs_dir = tmp_path / "gtfs"
         gtfs_dir.mkdir()
-        
+
         pd.DataFrame({"stop_id": ["1"]}).to_csv(gtfs_dir / "stops.txt", index=False)
         pd.DataFrame({"route_id": ["L1"]}).to_csv(gtfs_dir / "routes.txt", index=False)
-        pd.DataFrame({"fare_id": ["F1"]}).to_csv(gtfs_dir / "fare_attributes.txt", index=False)
-        pd.DataFrame({"transfer_type": [0]}).to_csv(gtfs_dir / "transfers.txt", index=False)
+        pd.DataFrame({"fare_id": ["F1"]}).to_csv(
+            gtfs_dir / "fare_attributes.txt", index=False
+        )
+        pd.DataFrame({"transfer_type": [0]}).to_csv(
+            gtfs_dir / "transfers.txt", index=False
+        )
 
         dataframes = gtfs_loader.load_gtfs_files(gtfs_dir)
 
@@ -274,7 +277,6 @@ class TestLoadGTFSFiles:
         assert "routes" in dataframes
         assert "fare_attributes" in dataframes
         assert "transfers" in dataframes
-
 
     def test_load_malformed_csv(self, gtfs_loader, tmp_path):
         """Test loading a malformed CSV file."""
