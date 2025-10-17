@@ -1,4 +1,4 @@
-.PHONY: test test-cov test-watch lint format
+.PHONY: test test-cov test-watch pylint lint format docker-up docker-down docker-logs etl build-graph notebook help
 
 test:
 	uv run pytest tests/ -v
@@ -7,6 +7,9 @@ test-cov:
 	@echo "Test execution with coverage report"
 	uv run pytest --cov=src --cov-report=html tests/
 
+pylint:
+	@echo "Running linter (pylint)..."
+	uv run pylint src/ tests/
 
 lint:
 	@echo "Running linter (ruff)..."
@@ -15,6 +18,16 @@ lint:
 format:
 	@echo "Formatting code with linter (ruff)..."
 	uv run ruff format src/ tests/
+
+
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down
+
+docker-logs:
+	docker-compose logs -f
 
 
 etl:
@@ -41,3 +54,8 @@ help:
 	@echo "Code Quality:"
 	@echo "  make lint         - Lint the code with ruff"
 	@echo "  make format       - Format the code with ruff"
+	@echo ""
+	@echo "Docker:"
+	@echo "  make docker-up    - Start Docker services"
+	@echo "  make docker-down  - Stop Docker services"
+	@echo "  make docker-logs  - See Docker logs"

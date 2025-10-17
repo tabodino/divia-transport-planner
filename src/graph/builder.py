@@ -6,6 +6,7 @@ import networkx as nx
 import pandas as pd
 from loguru import logger
 from src.config import get_settings
+from src.utils.metrics import graph_nodes, graph_edges
 
 
 settings = get_settings()
@@ -47,6 +48,7 @@ class TransportGraphBuilder:
                 lon=stop["stop_lon"],
             )
 
+        graph_nodes.set(self.graph.number_of_nodes())
         logger.info(f"Added {self.graph.number_of_nodes()} nodes")
 
     def add_route_connections(self) -> None:
@@ -98,6 +100,7 @@ class TransportGraphBuilder:
                 )
                 edges_added += 1
 
+        graph_edges.set(self.graph.number_of_edges())
         logger.info(f"Added {edges_added} edges")
 
     def add_transfer_connections(self, max_transfer_distance: float = 0.005) -> None:
@@ -185,6 +188,8 @@ class TransportGraphBuilder:
             filepath = settings.processed_data_dir / "transport_graph.gml"
 
         self.graph = nx.read_gml(filepath)
+        graph_nodes.set(self.graph.number_of_nodes())
+        graph_edges.set(self.graph.number_of_edges())
         logger.info(f"Graph loaded from {filepath}")
 
         return self.graph

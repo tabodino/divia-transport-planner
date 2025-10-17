@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Tuple
 import networkx as nx
 from loguru import logger
+from src.utils.metrics import route_calculations_total, route_calculation_duration
 
 
 class RoutePlanner:
@@ -30,30 +31,36 @@ class RoutePlanner:
             Tuple of (path as list of stop IDs, total cost) or None if no path exists
         """
         try:
-            path = nx.shortest_path(
-                self.graph, source=origin, target=destination, weight=weight
-            )
+            with route_calculation_duration.time():
+                # Find shortest path
+                path = nx.shortest_path(
+                    self.graph, source=origin, target=destination, weight=weight
+                )
 
-            # Calculate total cost
-            total_cost = 0
-            for i in range(len(path) - 1):
-                # Get edge data (may have multiple edges)
-                edges = self.graph.get_edge_data(path[i], path[i + 1])
-                if edges:
-                    # Use the first edge's weight
-                    edge_data = list(edges.values())[0]
-                    total_cost += edge_data.get(weight, 1)
+                # Calculate total cost
+                total_cost = 0
+                for i in range(len(path) - 1):
+                    # Get edge data (may have multiple edges)
+                    edges = self.graph.get_edge_data(path[i], path[i + 1])
+                    if edges:
+                        # Use the first edge's weight
+                        edge_data = list(edges.values())[0]
+                        total_cost += edge_data.get(weight, 1)
 
+            route_calculations_total.labels(status="success").inc()
             logger.info(f"Found path from {origin} to {destination}: {len(path)} stops")
             return path, total_cost
 
         except nx.NetworkXNoPath:
+            route_calculations_total.labels(status="no_path").inc()
             logger.warning(f"No path found from {origin} to {destination}")
             return None
         except nx.NodeNotFound as e:
+            route_calculations_total.labels(status="error").inc()
             logger.error(f"Stop not found: {e}")
             return None
         except Exception as e:
+            route_calculations_total.labels(status="error").inc()
             logger.error(f"Error finding path: {e}")
             return None
 

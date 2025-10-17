@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      # - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=INFO
+      - ENVIRONMENT=development
+    # depends_on:
+      # redis:
+      #   condition: service_healthy
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # gradio:
+  #   build: .
+  #   ports:
+  #     - "7860:7860"
+  #   volumes:
+  #     - ./src:/app/src
+  #     - ./data:/app/data
+  #     - ./logs:/app/logs
+  #   environment:
+  #     - REDIS_URL=redis://redis:6379
+  #     - LOG_LEVEL=INFO
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #   depends_on:
+  #     - redis
+  #     - api
+  #   command: python src/llm/gradio_app.py
+
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+volumes:
+  # redis_data:
+  prometheus_data:
