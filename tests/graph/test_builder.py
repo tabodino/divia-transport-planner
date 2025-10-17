@@ -161,9 +161,9 @@ def test_build_graph_with_transfers(builder):
 
 def test_build_graph_without_transfers(builder):
     with (
-        patch.object(builder, "load_gtfs_data") as m_load,
-        patch.object(builder, "add_stops_as_nodes") as m_nodes,
-        patch.object(builder, "add_route_connections") as m_routes,
+        patch.object(builder, "load_gtfs_data"),
+        patch.object(builder, "add_stops_as_nodes"),
+        patch.object(builder, "add_route_connections"),
         patch.object(builder, "add_transfer_connections") as m_transfers,
     ):
         builder.build_graph(include_transfers=False)
