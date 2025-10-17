@@ -36,6 +36,9 @@ etl:
 build-graph:
 	uv run python run_graph.py
 
+api:
+	uv run python run_api.py
+
 notebook:
 	uv run jupyter notebook notebooks/
 
@@ -45,6 +48,7 @@ help:
 	@echo "Execution:"
 	@echo "  make etl          - Download and extract GTFS data"
 	@echo "  make build-graph  - Build the transport graph with networkX"
+	@echo "  make api          - Start the FastAPI server"
 	@echo "  make notebook     - Open Jupyter Notebook"
 	@echo ""
 	@echo "Tests:"

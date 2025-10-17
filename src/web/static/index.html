@@ -1,8 +1,31 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DiviaMobilités Transport Planner</title>
-    <body></body>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>DiviaMobilités Transport Planner</title>
+        <link type="text/css" rel="stylesheet" href="./static/styles.css">
+    </head>
+    <body>
+        <h1>🚌 DiviaMobilités Transport Planner API</h1>
+        <p>Welcome to the route planning API for DiviaMobilités public transport network!</p>
+        
+        <div class="card">
+            <h2>📚 Documentation</h2>
+            <ul>
+                <li>📖 <a href="/docs">Interactive API Documentation (Swagger UI)</a></li>
+                <li>📋 <a href="/redoc">Alternative Documentation (ReDoc)</a></li>
+                <li>📊 <a href="/metrics">Prometheus Metrics</a></li>
+            </ul>
+        </div>
+        
+        <div class="card">
+            <h2>🔗 Quick Links</h2>
+            <ul>
+                <li>🏥 <a href="/health">Health Check</a></li>
+                <li>🚏 <a href="/api/v1/stops?limit=10">List Stops</a></li>
+                <li>🚌 <a href="/api/v1/routes">List Routes</a></li>
+            </ul>
+        </div>
+    </body>
 </html>
