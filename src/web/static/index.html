@@ -1,31 +1,86 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DiviaMobilités Transport Planner</title>
-        <link type="text/css" rel="stylesheet" href="./static/styles.css">
-    </head>
-    <body>
-        <h1>🚌 DiviaMobilités Transport Planner API</h1>
-        <p>Welcome to the route planning API for DiviaMobilités public transport network!</p>
-        
-        <div class="card">
-            <h2>📚 Documentation</h2>
-            <ul>
-                <li>📖 <a href="/docs">Interactive API Documentation (Swagger UI)</a></li>
-                <li>📋 <a href="/redoc">Alternative Documentation (ReDoc)</a></li>
-                <li>📊 <a href="/metrics">Prometheus Metrics</a></li>
-            </ul>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiviaMobilités - Planificateur d'itinéraire</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚌 DiviaMobilités</h1>
+            <p class="subtitle">Planificateur d'itinéraire intelligent</p>
+        </header>
+
+        <div class="main-content">
+            <div class="card search-panel">
+                <h2 style="margin-bottom: 20px; color: #111827;">Rechercher un itinéraire</h2>
+                
+                <div class="form-group">
+                    <label for="departure">Départ</label>
+                    <input 
+                        type="text" 
+                        id="departure" 
+                        placeholder="Rechercher un arrêt de départ..."
+                        autocomplete="off"
+                    />
+                    <select id="departureSelect" style="display: none;">
+                        <option value="">Sélectionner un arrêt</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="arrival">Arrivée</label>
+                    <input 
+                        type="text" 
+                        id="arrival" 
+                        placeholder="Rechercher un arrêt d'arrivée..."
+                        autocomplete="off"
+                    />
+                    <select id="arrivalSelect" style="display: none;">
+                        <option value="">Sélectionner un arrêt</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="alternatives">Nombre d'itinéraires</label>
+                    <select id="alternatives">
+                        <option value="1" selected>Plus rapide uniquement</option>
+                        <option value="2">2 itinéraires (plus lent)</option>
+                        <option value="3">3 itinéraires (plus lent)</option>
+                        <option value="4">4 itinéraires (plus lent)</option>
+                        <option value="5">5 itinéraires (plus lent)</option>
+                    </select>
+                     <small style="color: #6b7280; font-size: 0.85rem;">
+                        💡 Sélectionner "Plus rapide uniquement" pour une réponse instantanée
+                    </small>
+                </div>
+
+                <button class="btn btn-primary" id="searchBtn">
+                    Rechercher l'itinéraire
+                </button>
+
+                <button class="btn btn-secondary" id="clearBtn">
+                    Effacer
+                </button>
+
+                <div id="message"></div>
+
+                <div class="results-section" id="results" style="display: none;">
+                    <h3 style="margin-bottom: 12px; color: #111827;">Itinéraires Trouvés</h3>
+                    <div id="routesList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div id="map"></div>
+            </div>
         </div>
-        
-        <div class="card">
-            <h2>🔗 Quick Links</h2>
-            <ul>
-                <li>🏥 <a href="/health">Health Check</a></li>
-                <li>🚏 <a href="/api/v1/stops?limit=10">List Stops</a></li>
-                <li>🚌 <a href="/api/v1/routes">List Routes</a></li>
-            </ul>
-        </div>
-    </body>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/app.js"></script>
+</body>
 </html>

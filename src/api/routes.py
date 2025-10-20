@@ -14,9 +14,9 @@ from .models import (
     Route,
     StopInfo,
 )
-from src.graph.router import RoutePlanner
-from src.config import get_settings
-from src.utils.metrics import api_requests_total, api_request_duration
+from ..graph.router import RoutePlanner
+from ..config import get_settings
+from ..utils.metrics import api_requests_total, api_request_duration
 
 router = APIRouter(prefix="/api/v1", tags=["routing"])
 settings = get_settings()
@@ -34,98 +34,119 @@ def get_planner() -> RoutePlanner:
     return route_planner
 
 
-@router.post("/route", response_model=RouteResponse)
-async def calculate_route(request: RouteRequest) -> RouteResponse:
-    """Calculate shortest route between two stops."""
+@router.post("/route", response_model=RouteResponse | AlternativeRoutesResponse)
+async def calculate_route(
+    request: RouteRequest,
+) -> RouteResponse | AlternativeRoutesResponse:
+    """
+    Calculate route between two stops.
+
+    By default, returns only the shortest path for fast response.
+    Set include_alternatives=true to get multiple route options (slower).
+    """
     with api_request_duration.labels(method="POST", endpoint="/route").time():
         planner = get_planner()
 
-        logger.info(f"Calculating route from {request.departure} to {request.arrival}")
-
-        result = planner.find_shortest_path(request.departure, request.arrival)
-
-        if result is None:
-            api_requests_total.labels(
-                method="POST", endpoint="/route", status="404"
-            ).inc()
-            raise HTTPException(
-                status_code=404,
-                detail=f"No route found from {request.departure} to {request.arrival}",
+        if request.include_alternatives:
+            # Calculate multiple alternative routes (slower)
+            logger.info(
+                f"Calculating {request.max_alternatives} alternative routes "
+                f"from {request.departure} to {request.arrival}"
             )
 
-        path, total_cost = result
-        stops = planner.get_path_details(path)
+            results = planner.find_alternative_routes(
+                request.departure, request.arrival, k=request.max_alternatives
+            )
 
-        # Count transfers
-        num_transfers = sum(1 for stop in stops if stop.get("is_transfer", False))
+            if not results:
+                api_requests_total.labels(
+                    method="POST", endpoint="/route", status="404"
+                ).inc()
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No routes found from {request.departure} to {request.arrival}",
+                )
 
-        api_requests_total.labels(method="POST", endpoint="/route", status="200").inc()
+            routes = []
+            for path, total_cost in results:
+                stops = planner.get_path_details(path)
+                num_transfers = sum(
+                    1 for stop in stops if stop.get("is_transfer", False)
+                )
 
-        return RouteResponse(
-            origin=request.departure,
-            destination=request.arrival,
-            path=path,
-            stops=[StopInfo(**stop) for stop in stops],
-            total_cost=total_cost,
-            num_stops=len(path),
-            num_transfers=num_transfers,
-        )
+                routes.append(
+                    RouteResponse(
+                        origin=request.departure,
+                        destination=request.arrival,
+                        path=path,
+                        stops=[StopInfo(**stop) for stop in stops],
+                        total_cost=total_cost,
+                        num_stops=len(path),
+                        num_transfers=num_transfers,
+                    )
+                )
+
+            api_requests_total.labels(
+                method="POST", endpoint="/route", status="200"
+            ).inc()
+
+            return AlternativeRoutesResponse(
+                origin=request.departure,
+                destination=request.arrival,
+                routes=routes,
+            )
+        else:
+            # Calculate only shortest path (fast)
+            logger.info(
+                f"Calculating shortest route from {request.departure} to {request.arrival}"
+            )
+
+            result = planner.find_shortest_path(request.departure, request.arrival)
+
+            if result is None:
+                api_requests_total.labels(
+                    method="POST", endpoint="/route", status="404"
+                ).inc()
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No route found from {request.departure} to {request.arrival}",
+                )
+
+            path, total_cost = result
+            stops = planner.get_path_details(path)
+
+            # Count transfers
+            num_transfers = sum(1 for stop in stops if stop.get("is_transfer", False))
+
+            api_requests_total.labels(
+                method="POST", endpoint="/route", status="200"
+            ).inc()
+
+            return RouteResponse(
+                origin=request.departure,
+                destination=request.arrival,
+                path=path,
+                stops=[StopInfo(**stop) for stop in stops],
+                total_cost=total_cost,
+                num_stops=len(path),
+                num_transfers=num_transfers,
+            )
 
 
-@router.post("/route/alternatives", response_model=AlternativeRoutesResponse)
+@router.post(
+    "/route/alternatives", response_model=AlternativeRoutesResponse, deprecated=True
+)
 async def calculate_alternative_routes(
     request: RouteRequest,
 ) -> AlternativeRoutesResponse:
-    """Calculate alternative routes between two stops."""
-    with api_request_duration.labels(
-        method="POST", endpoint="/route/alternatives"
-    ).time():
-        planner = get_planner()
+    """
+    Calculate alternative routes between two stops.
 
-        logger.info(
-            f"Calculating {request.alternatives} alternative routes "
-            f"from {request.departure} to {request.arrival}"
-        )
-
-        results = planner.find_alternative_routes(
-            request.departure, request.arrival, k=request.alternatives
-        )
-
-        if not results:
-            api_requests_total.labels(
-                method="POST", endpoint="/route/alternatives", status="404"
-            ).inc()
-            raise HTTPException(
-                status_code=404,
-                detail=f"No routes found from {request.departure} to {request.arrival}",
-            )
-
-        routes = []
-        for path, total_cost in results:
-            stops = planner.get_path_details(path)
-            num_transfers = sum(1 for stop in stops if stop.get("is_transfer", False))
-
-            routes.append(
-                RouteResponse(
-                    origin=request.departure,
-                    destination=request.arrival,
-                    path=path,
-                    stops=[StopInfo(**stop) for stop in stops],
-                    total_cost=total_cost,
-                    num_stops=len(path),
-                    num_transfers=num_transfers,
-                )
-            )
-
-        api_requests_total.labels(
-            method="POST", endpoint="/route/alternatives", status="200"
-        ).inc()
-
-        return AlternativeRoutesResponse(
-            origin=request.departure,
-            destination=request.arrival,
-            routes=routes,
-        )
+    DEPRECATED: Use POST /route with include_alternatives=true instead.
+    """
+    # Force alternatives calculation
+    request.include_alternatives = True
+    return await calculate_route(request)
 
 
 @router.get("/stops", response_model=StopsResponse)

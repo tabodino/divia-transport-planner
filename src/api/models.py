@@ -9,7 +9,12 @@ class RouteRequest(BaseModel):
 
     departure: str = Field(..., description="Departure stop ID")
     arrival: str = Field(..., description="Arrival stop ID")
-    alternatives: int = Field(1, ge=1, le=5, description="Number of alternative routes")
+    include_alternatives: bool = Field(
+        False, description="Include alternative routes (slower)"
+    )
+    max_alternatives: int = Field(
+        3, ge=1, le=5, description="Maximum number of alternative routes"
+    )
 
 
 class StopInfo(BaseModel):

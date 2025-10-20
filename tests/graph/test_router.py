@@ -81,10 +81,55 @@ def test_find_shortest_path_generic_exception():
     assert result is None
 
 
+def test_find_alternative_routes_min_weight_edge_selected():
+    G = nx.MultiDiGraph()
+    G.add_edge("A", "B", weight=10)
+    G.add_edge("A", "B", weight=5)  # lower weight edge
+    G.add_edge("B", "C", weight=1)
+
+    planner = RoutePlanner(G)
+    routes = planner.find_alternative_routes("A", "C", k=1)
+
+    assert routes[0][0] == ["A", "B", "C"]
+    assert routes[0][1] == 6  # 5 (A->B) + 1 (B->C)
+
+
+def test_find_alternative_routes_no_path():
+    G = nx.MultiDiGraph()
+    G.add_node("A")
+    G.add_node("B")
+
+    planner = RoutePlanner(G)
+    result = planner.find_alternative_routes("A", "B")
+    assert result == []
+
+
+def test_find_alternative_routes_node_not_found():
+    G = nx.MultiDiGraph()
+    G.add_node("A")
+    planner = RoutePlanner(G)
+
+    result = planner.find_alternative_routes("A", "Z")  # Z n'existe pas
+    assert result == []
+
+
 def test_find_alternative_routes_error():
     G = nx.MultiDiGraph()
     planner = RoutePlanner(G)
     result = planner.find_alternative_routes("X", "Y")
+    assert result == []
+
+
+def test_find_alternative_routes_generic_exception():
+    class BrokenGraph:
+        def nodes(self, data=False):
+            raise Exception("Unexpected error in nodes")
+
+        def edges(self, data=False):
+            return []
+
+    planner = RoutePlanner(BrokenGraph())
+    result = planner.find_alternative_routes("A", "B")
     assert result == []
 
 

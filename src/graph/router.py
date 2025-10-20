@@ -3,6 +3,7 @@
 from typing import List, Dict, Any, Tuple
 import networkx as nx
 from loguru import logger
+
 from src.utils.metrics import route_calculations_total, route_calculation_duration
 
 
@@ -32,7 +33,6 @@ class RoutePlanner:
         """
         try:
             with route_calculation_duration.time():
-                # Find shortest path
                 path = nx.shortest_path(
                     self.graph, source=origin, target=destination, weight=weight
                 )
@@ -111,26 +111,55 @@ class RoutePlanner:
             List of (path, cost) tuples
         """
         try:
+            # shortest_simple_paths doesn't support multigraphs, so we create a simple graph
+            # keeping only the edge with minimum weight between each pair of nodes
+            simple_graph = nx.DiGraph()
+
+            # Copy nodes with attributes
+            for node, data in self.graph.nodes(data=True):
+                simple_graph.add_node(node, **data)
+
+            # For each pair of nodes, keep only the edge with minimum weight
+            for u, v, data in self.graph.edges(data=True):
+                if simple_graph.has_edge(u, v):
+                    # Keep edge with minimum weight
+                    current_weight = simple_graph[u][v].get("weight", 1)
+                    new_weight = data.get("weight", 1)
+                    if new_weight < current_weight:
+                        simple_graph.add_edge(u, v, **data)
+                else:
+                    simple_graph.add_edge(u, v, **data)
+
+            # Find k shortest simple paths using the simplified graph
             paths = list(
                 nx.shortest_simple_paths(
-                    self.graph, source=origin, target=destination, weight="weight"
+                    simple_graph, source=origin, target=destination, weight="weight"
                 )
             )
 
             results = []
             for path in paths[:k]:
-                # Calculate cost
+                # Calculate cost using the original multigraph to get accurate weights
                 total_cost = 0
                 for i in range(len(path) - 1):
                     edges = self.graph.get_edge_data(path[i], path[i + 1])
                     if edges:
-                        edge_data = list(edges.values())[0]
-                        total_cost += edge_data.get("weight", 1)
+                        # Use the minimum weight edge
+                        min_weight = min(
+                            edge.get("weight", 1) for edge in edges.values()
+                        )
+                        total_cost += min_weight
                 results.append((path, total_cost))
 
             logger.info(f"Found {len(results)} alternative routes")
             return results
 
+        except nx.NetworkXNoPath:
+            logger.warning(f"No path found from {origin} to {destination}")
+            return []
+        except nx.NodeNotFound as e:
+            logger.error(f"Stop not found: {e}")
+            return []
         except Exception as e:
             logger.error(f"Error finding alternative routes: {e}")
             return []
@@ -146,7 +175,7 @@ class RoutePlanner:
             List of nearby stop IDs
         """
         try:
-            # Use Breadth First Search (BFS) to find stops within max_distance hops
+            # Use BFS to find stops within max_distance hops
             nearby = []
             visited = {stop_id}
             queue = [(stop_id, 0)]
