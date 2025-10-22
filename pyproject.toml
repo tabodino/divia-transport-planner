@@ -5,18 +5,29 @@ description = "A comprehensive route planning system for the DiviaMobilités pub
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "chromadb>=1.2.0",
     "dotenv>=0.9.9",
     "fastapi>=0.119.0",
     "folium>=0.20.0",
+    "gradio>=5.23.1",
+    "huggingface-hub>=0.35.3",
     "jupyter>=1.1.1",
+    "langchain>=1.0.1",
+    "langchain-community>=0.4",
+    "langchain-core>=1.0.0",
+    "langchain-huggingface>=1.0.0",
+    "langchain-openai>=1.0.0",
+    "langchain-text-splitters>=1.0.0",
     "loguru>=0.7.3",
     "matplotlib>=3.10.7",
     "networkx>=3.5",
+    "openai>=2.5.0",
     "pandas>=2.3.3",
     "prometheus-client>=0.23.1",
     "pydantic>=2.12.0",
     "pydantic-settings>=2.11.0",
     "seaborn>=0.13.2",
+    "sentence-transformers>=5.1.1",
     "uvicorn[standard]>=0.37.0",
 ]
 

@@ -13,6 +13,22 @@ services:
       - ENVIRONMENT=development
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
 
+  gradio:
+    build: .
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - LOG_LEVEL=INFO
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - HUGGINGFACE_API_KEY=${HUGGINGFACE_API_KEY}
+    depends_on:
+      - api
+    command: python src/llm/gradio_app.py
+
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -23,7 +39,6 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
-
 
 volumes:
   prometheus_data:

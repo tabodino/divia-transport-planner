@@ -1,6 +1,7 @@
 """Application configuration."""
 
 from pathlib import Path
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -32,6 +33,17 @@ class Settings(BaseSettings):
     # GTFS Data
     gtfs_url: str = (
         "https://www.data.gouv.fr/api/1/datasets/r/e0dbd217-15cd-4e28-9459-211a27511a34"
+    )
+
+    # LLM Configuration
+    llm_provider: str = Field(
+        default="openai", description="LLM provider to use: 'openai' or 'huggingface'"
+    )
+    openai_api_key: str = ""
+    huggingface_api_key: str = ""
+    huggingface_model: str = Field(
+        default="mistralai/Mistral-7B-Instruct-v0.2",
+        description="HuggingFace model to use",
     )
 
     # Paths
