@@ -42,6 +42,9 @@ api:
 notebook:
 	uv run jupyter notebook notebooks/
 
+chatbot:
+	python run_gradio.py
+
 
 help:
 	@echo "Available commands:"
@@ -50,6 +53,7 @@ help:
 	@echo "  make build-graph  - Build the transport graph with networkX"
 	@echo "  make api          - Start the FastAPI server"
 	@echo "  make notebook     - Open Jupyter Notebook"
+	@echo "  make chatbot      - Open the Gradio Chatbot interface"
 	@echo ""
 	@echo "Tests:"
 	@echo "  make test         - Run tests"

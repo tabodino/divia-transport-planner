@@ -9,64 +9,85 @@ from src.config import get_settings
 settings = get_settings()
 
 
+def respond(message: str, history: list, rag_system: DiviaMobilitesRAG) -> tuple:
+    """Process user message and return response.
+
+    Args:
+        message: User message
+        history: Chat history in messages format [{"role": "user", "content": "..."}, ...]
+        rag_system: RAG system instance to use
+
+    Returns:
+        Tuple of (updated_history, empty_string_for_textbox)
+    """
+
+    # Check if RAG system is initialized
+    if not rag_system or not rag_system.chain:
+        logger.error("RAG system not initialized")
+        error_answer = "Désolé, le système d'assistance n'est pas disponible. Veuillez vérifier la configuration."
+        history = history or []
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": error_answer})
+        return history, ""
+
+    try:
+        logger.info("Calling RAG system...")
+        result = rag_system.ask(message)
+
+        logger.debug(f"Result keys: {result.keys()}")
+        answer = result["answer"]
+        logger.info(f"Answer received (length: {len(answer)})")
+        logger.debug(f"Answer preview: {answer[:100]}...")
+
+        # Add provider info
+        provider = result.get("provider", "unknown")
+        answer += f"\n\n_Réponse générée par {provider}_"
+
+        # Add sources if available
+        if result["sources"]:
+            logger.info(f"Adding {len(result['sources'])} sources to answer")
+            answer += "\n\n📚 **Sources:**\n"
+            for source in result["sources"][:2]:  # Limit to 2 sources
+                answer += f"- {source['title']} ({source['category']})\n"
+
+        # Update history with new messages in messages format
+        history = history or []
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": answer})
+
+        return history, ""
+
+    except Exception as e:
+        logger.error("Error in respond function")
+        logger.error(f"Error type: {type(e).__name__}")
+        logger.error(f"Error message: {str(e)}")
+
+        # Return error message to user in messages format
+        error_answer = f"Erreur: {str(e)}"
+        history = history or []
+        history.append({"role": "user", "content": message})
+        history.append({"role": "assistant", "content": error_answer})
+        return history, ""
+
+
 def create_chatbot_interface():
     """Create Gradio chatbot interface."""
 
     # Initialize RAG system
-    logger.info("Initializing Gradio chatbot interface")
+    logger.info("Creating RAG system instance...")
     rag = DiviaMobilitesRAG()
 
     if not rag.chain:
-        logger.error(
-            "RAG system failed to initialize - chatbot will show error messages"
-        )
+        logger.error("RAG system failed to initialize")
     else:
         logger.info("RAG system initialized successfully")
 
-    def respond(message: str, history: list) -> tuple:
-        """Process user message and return response.
+    def respond_wrapper(message: str, history: list) -> tuple:
+        """Wrapper to pass rag system to respond function."""
+        return respond(message, history, rag)
 
-        Args:
-            message: User message
-            history: Chat history in messages format
-                e.g. [{"role": "user", "content": "..."}, ...]
-
-        Returns:
-            Tuple of (updated_history, empty_string_for_textbox)
-        """
-
-        logger.info(f"User question: {message}")
-        try:
-            result = rag.ask(message)
-            answer = result["answer"]
-
-            # Add sources if available
-            if result["sources"]:
-                answer += "\n\n📚 **Sources:**\n"
-                for source in result["sources"][:2]:  # Limit to 2 sources
-                    answer += f"- {source['title']} ({source['category']})\n"
-
-            logger.info(f"Bot response: {answer[:100]}...")
-
-            # Update history with new messages
-            history = history or []
-            history.append({"role": "user", "content": message})
-            history.append({"role": "assistant", "content": answer})
-            # history.append([message, answer])
-
-            return history, ""
-        except Exception as e:
-            logger.error(f"Error type: {type(e).__name__}")
-            logger.error(f"Error message: {str(e)}")
-            error_answer = f"Erreur: {str(e)}"
-            history = history or []
-            history.append({"role": "user", "content": message})
-            history.append({"role": "assistant", "content": error_answer})
-            return history, ""
-
-    def reset_chat() -> tuple:
+    def reset_chat():
         """Reset chat conversation."""
-        logger.info("Resetting chat conversation")
         rag.reset_conversation()
         return [], ""
 
@@ -114,9 +135,8 @@ def create_chatbot_interface():
             """
         )
 
-        # Event handlers
-        msg.submit(respond, [msg, chatbot], [chatbot, msg])
-        submit.click(respond, [msg, chatbot], [chatbot, msg])
+        msg.submit(respond_wrapper, [msg, chatbot], [chatbot, msg])
+        submit.click(respond_wrapper, [msg, chatbot], [chatbot, msg])
         clear.click(reset_chat, None, [chatbot, msg])
 
         gr.Markdown(
@@ -139,5 +159,5 @@ def main():
     demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
