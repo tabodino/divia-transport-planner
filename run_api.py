@@ -20,7 +20,7 @@ def main():
         host=settings.api_host,
         port=settings.api_port,
         reload=settings.log_level,
-        log_level=settings.log_level.lower()
+        log_level=settings.log_level.lower(),
     )
 
 

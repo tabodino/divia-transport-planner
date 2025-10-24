@@ -29,4 +29,4 @@ RUN uv pip install --system -e .
 EXPOSE 8000 7860
 
 # Default command
-CMD ["uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["python", "entrypoint.py"]

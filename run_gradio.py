@@ -15,11 +15,7 @@ settings = get_settings()
 def main():
     """Run Gradio interface."""
     demo = create_chatbot_interface()
-    demo.launch(
-        server_name="0.0.0.0",
-        server_port=7860,
-        share=False
-    )
+    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
 
 
 if __name__ == "__main__":
