@@ -1,3 +1,13 @@
+---
+title: DiviaMobilités Transport Planner
+emoji: 🚍
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_file: Dockerfile
+pinned: false
+---
+
 # Divia-Transport-Planner
 
 A comprehensive route planning system for the "DiviaMobilités" public transportation network using GTFS data, NetworkX graph algorithms, and AI-powered assistance.
