@@ -20,7 +20,6 @@ COPY pyproject.toml ./
 COPY src ./src
 
 RUN mkdir -p ./data
-COPY data ./data
 
 # Install dependencies
 RUN uv pip install --system -e .
