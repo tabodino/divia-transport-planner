@@ -32,6 +32,11 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application
+COPY entrypoint.py ./
+COPY run_api.py ./  
+COPY run_etl.py ./
+COPY run_gradio.py ./ 
+COPY run_graph.py ./ 
 COPY src ./src
 
 # Create empty data directory

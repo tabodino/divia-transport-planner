@@ -17,6 +17,11 @@ ENV PATH="/root/.local/bin:$PATH"
 
 # Copy project files
 COPY pyproject.toml ./
+COPY entrypoint.py ./
+COPY run_api.py ./  
+COPY run_etl.py ./
+COPY run_gradio.py ./ 
+COPY run_graph.py ./ 
 COPY src ./src
 
 RUN mkdir -p ./data
