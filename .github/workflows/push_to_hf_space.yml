@@ -26,4 +26,5 @@ jobs:
         cd hf_space
         git add .
         git commit -m "Sync from GitHub ($GITHUB_SHA)" || echo "No changes to commit"
-        git push https://huggingface.co/spaces/tabodino/divia-transport-planner main
+        git push https://hf_user:${HF_TOKEN}@huggingface.co/spaces/tabodino/divia-transport-planner main
+
