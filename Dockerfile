@@ -18,6 +18,8 @@ ENV PATH="/root/.local/bin:$PATH"
 # Copy project files
 COPY pyproject.toml ./
 COPY src ./src
+
+RUN mkdir -p ./data
 COPY data ./data
 
 # Install dependencies

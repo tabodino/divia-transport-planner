@@ -34,6 +34,27 @@ A comprehensive route planning system for the "DiviaMobilités" public transport
 
 <table> <thead> <tr> <th>Value</th> <th>Description</th> </tr> </thead> <tbody> <tr><td>0</td><td>Tram, Streetcar, Light rail</td></tr> <tr><td>1</td><td>Subway, Metro</td></tr> <tr><td>2</td><td>Rail</td></tr> <tr><td>3</td><td>Bus</td></tr> <tr><td>4</td><td>Ferry</td></tr> <tr><td>5</td><td>Cable car</td></tr> <tr><td>6</td><td>Gondola, Suspended cable car</td></tr> <tr><td>7</td><td>Funicular</td></tr> </tbody> </table>
 
+## Project Structure
+
+```
+divia-transport-planner/
+├── src/
+│   ├── api/              # FastAPI backend
+│   ├── etl/              # Data extraction, transformation, loading
+│   ├── graph/            # NetworkX graphs builder and router
+│   ├── llm/              # LLM/RAG implementation
+│   ├── utils/            # Shared utilities
+│   └── web/              # Web interface
+├── notebooks/            # Jupyter notebooks for EDA
+├── data/
+│   ├── raw/              # Raw GTFS data
+│   └── processed/        # Processed graph data
+├── tests/                # Unit and integration tests
+├── monitoring/           # Prometheus configuration
+├── logs/                 # Application logs
+└── docker-compose.yml    # Container orchestration
+```
+
 ## Setup
 
 ### Using uv
