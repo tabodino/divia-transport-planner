@@ -282,6 +282,78 @@ function clearForm() {
   map.setView([47.322, 5.0415], 13)
 }
 
+function getGradioUrl() {
+  // If localhost, use local Gradio URL
+  if (
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  ) {
+    return window.location.origin + "/gradio";
+  }
+  // We use huffingface space URL in production
+  return "https://tabodino-divia-transport-planner.hf.space/gradio";
+}
+
+// Initialize Chatbot Widget
+function initChatbotWidget() {
+  const btn = document.createElement('button');
+  btn.id = 'chatbot-toggle';
+  btn.style = `
+    position: fixed; bottom: 32px; right: 32px; z-index: 10001; width:62px; height:62px; 
+    border-radius:50%; background:linear-gradient(135deg,#6366f1 60%,#312e81 100%);
+    color:#fff; border:none; box-shadow:0 2px 16px rgba(50,50,150,.22); font-size:32px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  `;
+  btn.innerText = '💬';
+
+  // Chatbot Window (hidden by default)
+  const container = document.createElement('div');
+  container.id = 'chatbot-container';
+  container.style = `
+    position: fixed; bottom: 32px; right: 32px; width: 400px; height: 560px; background: #fff;
+    border-radius: 21px; box-shadow: 0 8px 36px rgba(34,34,78,0.32); z-index: 10000;
+    border: 1px solid #ddd; overflow: hidden; display: none;
+  `;
+
+  // Close button "X"
+  const closeBtn = document.createElement('button');
+  closeBtn.innerHTML = '&times;';
+  closeBtn.style = `
+    position: absolute; top: 8px; right: 12px; z-index: 10002; background: transparent;
+    border: none; font-size: 2rem; color: #444; cursor: pointer;
+  `;
+
+  // Gradio Component (Absolute url needed on production)
+  const gradio = document.createElement('gradio-app');
+  gradio.setAttribute('src', getGradioUrl());
+  gradio.style = 'width:100%; height:100%; border:none; display:block;';
+
+  // Assemble
+  container.appendChild(closeBtn);
+  container.appendChild(gradio);
+  document.body.appendChild(btn);
+  document.body.appendChild(container);
+
+  // Open/Close logic
+  btn.addEventListener('click', () => {
+    container.style.display = 'block';
+    btn.style.display = 'none';
+  });
+  closeBtn.addEventListener('click', () => {
+    container.style.display = 'none';
+    btn.style.display = 'flex';
+  });
+
+  // Close on Escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === "Escape" && container.style.display === "block") {
+      container.style.display = 'none';
+      btn.style.display = 'flex';
+    }
+  });
+}
+
+
 // Event listeners
 document.getElementById("searchBtn").addEventListener("click", searchRoute)
 document.getElementById("clearBtn").addEventListener("click", clearForm)
@@ -290,4 +362,5 @@ document.getElementById("clearBtn").addEventListener("click", clearForm)
 document.addEventListener("DOMContentLoaded", () => {
   initMap()
   loadStops()
+  initChatbotWidget()
 })

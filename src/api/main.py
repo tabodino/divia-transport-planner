@@ -1,5 +1,6 @@
 """FastAPI application entry point."""
 
+import os
 import pandas as pd
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
@@ -10,14 +11,19 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from prometheus_client import make_asgi_app
 from loguru import logger
+import gradio as gr
 
 from src.config import get_settings
 from src.graph.builder import TransportGraphBuilder
 from src.graph.router import RoutePlanner
 from . import routes
 from .models import HealthResponse
+from src.llm.gradio_app import create_chatbot_interface
+
 
 settings = get_settings()
+
+
 
 
 @asynccontextmanager
@@ -56,12 +62,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
 
     logger.info("Shutting down API")
 
+# Detect if running in Hugging Face Space
+in_space = bool(os.environ.get("HF_SPACE_ID"))
+root_path = "/proxy" if in_space else ""
 
 app = FastAPI(
     title="DiviaMobilités Transport Planner",
     description="Route planning API for DiviaMobilités public transport network",
     version="0.1.0",
     lifespan=lifespan,
+    root_path=root_path,
 )
 
 # CORS middleware
@@ -172,3 +182,7 @@ async def health() -> HealthResponse:
         num_nodes=num_nodes,
         num_edges=num_edges,
     )
+
+# Mount Gradio interface
+gradio_app = create_chatbot_interface()
+app = gr.mount_gradio_app(app, gradio_app, path="/gradio")
