@@ -48,9 +48,6 @@ htmlcov/
 .coverage.*
 .cache
 
-# Matplotlib
-*.png
-
 # macOS
 .DS_Store
 
