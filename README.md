@@ -12,6 +12,11 @@ pinned: false
 
 A comprehensive route planning system for the "DiviaMobilités" public transportation network using GTFS data, NetworkX graph algorithms, and AI-powered assistance.
 
+## Application screenshots
+<img src="docs/screenshots/home.jpg" width="200" height="120">
+<img src="docs/screenshots/chatbot-open.jpg" width="200" height="120">
+<img src="docs/screenshots/itinerary.jpg" width="200" height="120">
+
 ## Dataset
 
 **Sources**:
