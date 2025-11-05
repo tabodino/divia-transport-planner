@@ -8,6 +8,54 @@ from src.config import get_settings
 
 settings = get_settings()
 
+css = """
+/* Style chat conversational container */
+.gr-chatbot {
+  min-height: 150px !important;
+  background: rgba(246,248,255,0.92);
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(60,70,110,0.11);
+  padding: 10px;
+  overflow-y: auto !important;
+}
+
+/* Messages */
+.gr-message {
+  font-size: 1em !important;
+  line-height: 1.5 !important;
+  border-radius: 13px !important;
+  padding: 10px 12px !important;
+}
+
+/* Input user field */
+.gr-textbox {
+  min-width: 250px !important;
+  width: 98% !important;
+  height: 80px !important;
+}
+textarea[data-testid="textbox"] {
+  min-height: 42px !important;
+  height: 80px !important;
+  font-size: 1em !important;
+  padding: 8px 12px !important;
+}
+
+/* Send Button */
+.gr-button {
+  min-width: 100px !important;
+  font-size: 1em !important;
+  padding: 8px 16px !important;
+}
+
+/* Custom bot icon */
+.gr-chatbot .avatar img {
+  content: url('/static/images/robot-mask.png');
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: #dbeafe;
+}
+"""
+
 
 def respond(message: str, history: list, rag_system: DiviaMobilitesRAG) -> tuple:
     """Process user message and return response.
@@ -95,6 +143,7 @@ def create_chatbot_interface():
     with gr.Blocks(
         title="DiviaMobilités Assistant",
         theme=gr.themes.Soft(primary_hue="indigo", secondary_hue="purple"),
+        css=css
     ) as demo:
         gr.Markdown(
             """

@@ -74,22 +74,15 @@
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card card-map">
                 <div id="map"></div>
             </div>
         </div>
 
-        <!-- Bouton bulle flottant -->
-        <button id="chatbot-toggle"
-        style="position: fixed; bottom: 32px; right: 32px; z-index: 10001; width:62px; height:62px; border-radius:50%;
-                background:linear-gradient(135deg, #6366f1 60%, #312e81 100%); color:#fff; border:none; 
-                box-shadow:0 2px 16px rgba(50,50,150,.22); font-size:32px; display:flex; align-items:center; justify-content:center;">
-        💬
-        </button>
-
-        <div id="chatbot-container">
-            <gradio-app src="http://localhost:8000/gradio"></gradio-app>
-        </div>
+        <div id="chatbot-container"></div>
+    
+    </div>
+    </div>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="/static/app.js"></script>

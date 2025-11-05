@@ -304,7 +304,7 @@ function initChatbotWidget() {
     color:#fff; border:none; box-shadow:0 2px 16px rgba(50,50,150,.22); font-size:32px;
     display:flex; align-items:center; justify-content:center; cursor:pointer;
   `;
-  btn.innerText = '💬';
+  btn.innerHTML = '<i class="chatbot-icon"></i>';
 
   // Chatbot Window (hidden by default)
   const container = document.createElement('div');
@@ -324,7 +324,7 @@ function initChatbotWidget() {
   `;
 
   // Gradio Component (Absolute url needed on production)
-  const gradio = document.createElement('gradio-app');
+  const gradio = document.createElement('iframe');
   gradio.setAttribute('src', getGradioUrl());
   gradio.style = 'width:100%; height:100%; border:none; display:block;';
 
