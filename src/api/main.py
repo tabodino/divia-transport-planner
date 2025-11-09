@@ -83,7 +83,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-static_path = Path(__file__).parent.parent / "web" / "static"
+possible_paths = [
+    Path(__file__).parent / "web" / "static",
+    Path(__file__).parent.parent / "web" / "static",
+    Path(__file__).resolve().parents[1] / "src" / "web" / "static",
+]
+
+static_path = next((p for p in possible_paths if p.exists()), None)
 if static_path.exists():
     app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
     logger.info(f"Mounted static files from {static_path}")
