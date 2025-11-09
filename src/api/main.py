@@ -94,6 +94,8 @@ if static_path.exists():
     app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
     logger.info(f"Mounted static files from {static_path}")
 
+logger.info(f"Static dir content: {[p.name for p in static_path.iterdir()]}")
+
 # Include API routes
 app.include_router(routes.router)
 
