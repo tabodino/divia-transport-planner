@@ -8,7 +8,7 @@
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
-  background-image: url("/static/images/background-image.jpg");
+  background-image: url("./images/background.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -322,7 +322,7 @@ select:focus {
 }
 
 #chatbot-toggle .chatbot-icon {
-  background-image: url("/static/images/robot-mask.png");
+  background-image: url("./images/robot-mask.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
