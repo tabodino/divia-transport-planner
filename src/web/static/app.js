@@ -291,7 +291,7 @@ function getGradioUrl() {
     return window.location.origin + "/gradio";
   }
   // We use huffingFace proxy URL in production
-  return "/proxy/gradio";
+  return "/proxy/gradio/";
 }
 
 // Initialize Chatbot Widget
