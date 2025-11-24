@@ -9,7 +9,7 @@ API_HOST = os.environ.get("API_HOST", "0.0.0.0")
 API_PORT = os.environ.get("API_PORT", "8000")
 API_CMD = [
     "uvicorn",
-    "src.api.main:app",
+    "src.api.main:final_app",
     "--host",
     API_HOST,
     "--port",

@@ -193,4 +193,4 @@ async def health() -> HealthResponse:
 
 # Mount Gradio interface
 gradio_app = create_chatbot_interface()
-app = gr.mount_gradio_app(app, gradio_app, path="/gradio")
+final_app = gr.mount_gradio_app(app, gradio_app, path="/gradio")
