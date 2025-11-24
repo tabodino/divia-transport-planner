@@ -111,7 +111,11 @@ async def root() -> HTMLResponse:
 
     if html_path.exists():
         with open(html_path, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
+            content = f.read()
+            if app.root_path:
+                content = content.replace('"/static/',
+                                          f'"{app.root_path}/static/')
+            return HTMLResponse(content=content)
 
     # Fallback to API info page
     return HTMLResponse(
