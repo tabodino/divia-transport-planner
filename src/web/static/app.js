@@ -291,7 +291,7 @@ function getGradioUrl() {
     return window.location.origin + "/gradio";
   }
   // We use huffingface space URL in production
-  return "https://tabodino-divia-transport-planner.hf.space/gradio";
+  return "https://tabodino-divia-transport-planner.hf.space/proxy/gradio";
 }
 
 // Initialize Chatbot Widget
